@@ -1,11 +1,11 @@
-package main
+package remote
 
 import (
 	"fmt"
 	"net"
 )
 
-func main() {
+func Start() {
 	ln, err := net.Listen("tcp", ":8080")
 
 	if err != nil {
@@ -23,4 +23,16 @@ func main() {
 }
 
 func handleConn(conn net.Conn) {
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Println("Error occured during connection: ", r)
+			conn.Close()
+			fmt.Println("Connection closed")
+		}
+	}()
+
+	buffer := make([]byte, 1024)
+	conn.Read(buffer)
+
+	fmt.Println(string(buffer))
 }
